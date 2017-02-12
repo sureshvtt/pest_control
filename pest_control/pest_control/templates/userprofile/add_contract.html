@@ -1,0 +1,308 @@
+{% extends 'userprofile/base.html' %}
+{% block main_link_id %}contractLink{% endblock %}
+{% block sub_link_id %}addContract{% endblock %}
+{% block content %}
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      
+      <h1>
+        Contract
+        <small>Add Contract</small>
+      </h1>
+      
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Contract</a></li>
+        <li class="active">Add Contract</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="box box-primary">
+          <div class="box-header with-border">
+            <h3 class="box-title">Enquiry Details <small><a href="{% url 'enquiry-report' %}">go back</a></small></h3>
+          </div>
+          
+          <div class="box-body">
+            <div class="row">
+              <div class="form-group col-md-3">
+                <label>Enquiry ID</label>
+                <input type="text" readonly class="form-control" value="{{enquiry.enquiry_id}}">
+              </div>
+              <div class="form-group col-md-3">
+                <label>Customer Name</label>
+                <input type="text" readonly class="form-control" value="{{enquiry.customer.contact_person|title}}">
+              </div>   
+              <div class="form-group col-md-3">
+                <label>Service Address</label>
+                <textarea readonly class="form-control">{{enquiry.customer.address|default:''}}</textarea>
+              </div> 
+              <div class="form-group col-md-3">
+                <label>Mobile</label>
+                <input type="text" readonly class="form-control" value="{{enquiry.customer.mobile}}">
+              </div> 
+            </div>
+            
+            <div class="row">
+              <div class="form-group col-md-3">
+                <label>Service Type</label>
+                <input type="text" readonly class="form-control" value="{{enquiry.customer.get_customer_type_display}}">
+              </div>
+              <div class="form-group col-md-3">
+                <label>Company Name</label>
+                <input type="text" readonly class="form-control" value="{{enquiry.customer.contact_person|title}}">
+              </div>   
+              <div class="form-group col-md-3">
+                <label>Enquiry Date</label>
+                <input type="text" readonly class="form-control" value="{{enquiry.enquiry_date}}">
+              </div> 
+              <div class="form-group col-md-3">
+                <label>Comments</label>
+                <textarea readonly class="form-control">{{enquiry.comments}}</textarea>
+              </div> 
+            </div>
+
+          </div>  
+
+          <form role="form" id="contractForm" action={% url 'add-contract' enq_id=enquiry.enquiry_id %} method='POST'>{% csrf_token %}
+            <div class="box-body">
+            
+              <h4>Contract Details</h4>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label>Billing Company Name</label>
+                  <textarea name="billing_company_name" class="form-control" required>{{enquiry.customer.company_name}}</textarea>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Billing Address</label>
+                  <textarea name="billing_address" class="form-control" required>{{enquiry.customer.address}}</textarea>
+                </div>
+
+                <div class="form-group col-md-3">
+                  <label>Service Required</label>
+                  <select name="service" class="form-control" id="service" required>
+                    <option value=''>Select Service</option>
+                    {% for service in services %}
+                    <option value="{{service.id}}" {% if enquiry.service_required.id == service.id%} selected="selected"{% endif %}>{{service.service}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="form-group col-md-3">
+                  <label>Contract Type</label>
+                  <select name="contract_type" id="contract_type" class="form-control" required>
+                    <option value=''>Select</option>
+                    {% for key, value in contract_type_choices %}
+                    <option value="{{key}}">{{value}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="form-group col-md-3">
+                  <label>Month & Services Schedules</label>
+                  <select name="schedule" id="schedule" class="form-control" required>
+                  </select>
+                </div>
+
+                <div class="form-group col-md-3">
+                  <label>No of Services</label>
+                  <input type="text" class="form-control" readonly name="no_of_services" id="no_of_services" value="">
+                </div>
+
+                <div class="form-group col-md-3">
+                  <label>Total Contract Amount</label>
+                  <input type="number" class="form-control" name="total_contract_amount" id="total_contract_amount" value="0" required>
+                </div>
+
+                <div class="form-group col-md-3">
+                  <label>Tax Applicable (15%)
+                    <input type="checkbox" name="is_tax_applicable" id="is_tax_applicable">
+                  </label>
+                  <a class="calculateAmount" style="cursor:pointer;">Calculate</a>
+                  <input type="number" readonly class="form-control" name="tax_amount" id="tax_amount" value="0">
+                </div>
+
+                <div class="form-group col-md-3">
+                  <label>Net Amount</label>
+                  <input type="number" readonly class="form-control" name="net_contract_amount" id="net_contract_amount">
+                </div>
+
+                <div class="form-group col-md-3">
+                  <label>Contract Date</label>
+                  <div class="input-group date">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" name="date"  class="form-control pull-right datepicker" required>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="row">
+                <div class="form-group col-md-4">
+                  <label>Terms & Conditions</label>
+                  <select name="terms" id="terms" class="form-control" required>
+                    <option value=''>Select</option>
+                    {% for key, value in contract_terms_choices %}
+                    <option value="{{key}}">{{value}}</option>
+                    {% endfor %}
+                  </select>
+                  <br>
+                  <label class="perMonthAmount"></label>
+                </div>
+
+                <div class="form-group col-md-4">
+                  <label>Contract Remarks</label>
+                  <input type="text" class="form-control" name="description">
+                </div>
+
+                <div class="form-group col-md-4">
+                  <label>Whose Order</label>
+                  <select name="contract_employee" class="form-control" required>
+                    {% for employee in employees %}
+                    <option value="{{employee.employee_id}}">{{employee.userprofile.full_name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+              </div>
+            </div>
+            <!-- /.box-body -->
+
+            <div class="box-footer">
+              <button type="submit" class="btn btn-primary submitBtn">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+    
+{% endblock %}
+
+{% block custom_js %}
+<script>
+  
+  var schedule_json = {
+    'amc' : [
+      {'schedule':'Daily', 'hour':365},
+      {'schedule':'Fortnightly', 'hour':24},
+      {'schedule':'Monthly', 'hour':12},
+      {'schedule':'Once_in_10_days', 'hour':36},
+      {'schedule':'Once_in_3_months', 'hour':4},
+      {'schedule':'Once_in_6_months', 'hour':2},
+      {'schedule':'Weekly', 'hour':52},
+      {'schedule':'Weekly_2_services', 'hour':104},
+      {'schedule':'Weekly_3_services', 'hour':156}
+    ],
+    's': [
+      {'schedule':'Single', 'hour':1}
+    ],
+    'st': [
+      {'schedule':'1_month_daily', 'hour':30},
+      {'schedule':'1_month_daily', 'hour':24},
+      {'schedule':'1_month_fortnightly', 'hour':2},
+      {'schedule':'1_month_monthly', 'hour':1}
+    ]
+  }
+  $('#contract_type').change(function(e) {
+    e.preventDefault();
+    var contract_type = $(this).val();
+    $('#schedule').html('<option value="">Select</option>')
+    for(var i=0;i<schedule_json[contract_type].length;i++){
+      $('#schedule').append('<option value="'+ schedule_json[contract_type][i].schedule +'">'+ schedule_json[contract_type][i].schedule +'</option>')
+    }
+  });
+  $('#schedule').change(function(e) {
+    e.preventDefault();
+    var contract_type = $('#contract_type').val();
+    var schedule = $(this).val();
+    var schedule_object = $.grep(schedule_json[contract_type], function(e){ return e['schedule'] == schedule; });
+    $('#no_of_services').val(schedule_object[0].hour);
+  });
+  $('.calculateAmount').click(function(e){
+    e.preventDefault();
+    var checkbox = $('#is_tax_applicable');
+    var total_contract_amount = $('#total_contract_amount').val();
+    if (total_contract_amount != '')
+      total_contract_amount = parseInt(total_contract_amount)
+
+    if(checkbox.is(':checked')){
+      if (total_contract_amount == 0 || total_contract_amount == ''){
+        alert('Enter valid Contract Amount');
+        $('#total_contract_amount').focus();
+        return false;
+      }
+      var tax_amount = total_contract_amount * 15/100
+      $('#tax_amount').val(tax_amount)
+      $('#net_contract_amount').val(tax_amount + total_contract_amount)
+    }
+    else{
+      $('#tax_amount').val('0');
+      $('#net_contract_amount').val(total_contract_amount)
+    }
+  });
+  $('#contractForm').submit(function(event) {
+    var form = $(this);
+    form.find('.submitBtn').attr('disabled', 'disabled');
+    form.find('.submitBtn').html('Saving..');
+  });
+
+  $('#contract_type').change(function(e) {
+    e.preventDefault();
+    var contract_type = $(this).val();
+    if(contract_type == 's'){
+      $('#terms').val('100');
+      $('#terms').attr('disabled', 'disabled')
+    }
+    else{
+      $('.perMonthAmount').html('')
+      $('#terms').val('');
+      $('#terms').removeAttr('disabled')
+    }
+  });
+  $('#terms').change(function(e) {
+    e.preventDefault();
+    var term = $(this).val();
+    if(term == 'monthly'){
+
+      var contract_type = $('#contract_type').val();
+      var total_contract_amount = $('#total_contract_amount').val();
+      var tax_amount = $('#tax_amount').val();
+
+      $('.perMonthAmount').removeClass('hidden')
+
+      if(contract_type == 'amc'){
+        var amount = total_contract_amount
+        if (tax_amount != 0){
+          amount = String(Math.round(parseInt(total_contract_amount)/12)) + ' + ' + String(Math.round(parseInt(tax_amount)/12))
+        }
+        $('.perMonthAmount').html('Per Month ' + String(amount))
+      }
+      else if(contract_type == 'st'){
+        var amount = total_contract_amount
+        if (tax_amount != 0){
+          amount = total_contract_amount + ' + ' + tax_amount
+        }
+        $('.perMonthAmount').html('Per Month ' + String(amount))
+      }
+      else{
+        $('.perMonthAmount').html('')
+      }
+    }
+    else{
+       $('.perMonthAmount').html('')
+    }
+  });
+</script>
+
+{% if success %}
+<script>
+  alert('Contract saved successfully');
+  window.location = "/dashboard/";
+</script>
+{% endif %}
+
+{% endblock %}

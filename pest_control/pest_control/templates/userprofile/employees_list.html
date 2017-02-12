@@ -1,0 +1,107 @@
+{% extends 'userprofile/base.html' %}
+{% block main_link_id %}employeeLink{% endblock %}
+{% block sub_link_id %}employeeList{% endblock %}
+{% block content %}
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      
+      <h1>
+        Employee
+        <small>List</small>
+      </h1>
+      
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Employee</a></li>
+        <li class="active">List</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="box box-primary">
+          <!--
+          <br><br>
+          <form id="enquiryForm" action={% url 'employees-list' %} method='GET'>
+            <div class="col-md-2">
+              <h4>Select Date Range</h4>
+            </div>
+            <div class="input-group col-md-8">
+              <input type="text" name="enquiry_date_range"  class="form-control daterange pull-right" required>
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary btn-flat">Search</button>
+              </span>
+            </div>
+          </form>
+      
+          <div class="box-header">
+            <h3 class="box-title"></h3>
+          </div>
+          -->
+          <!-- /.box-header -->
+
+          <div class="box-body table-responsive no-padding">
+            <table id="enquiryReportTable" class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <td>No</td>
+                  <td>Date of Join</td>
+                  <td>Employee Code</td>
+                  <td>Username</td>
+                  <td>Full name</td>
+                  <td>Father</td>
+                  <td>Present Address</td>
+                  <td>Mobile</td>
+                  <td>Designation</td>
+                  <td>Gender</td>
+                  <td>DOB</td>
+                  <td>Actions</td>
+                </tr>
+              </thead>
+              <tbody>
+                {% for employee in employees %}
+                <tr>
+                  <td>{{forloop.counter}}</td>
+                  <td>{{employee.date_joined}}</td>
+                  <td>{{employee.employee_id}}</td>
+                  <td>{{employee.userprofile.user.username}}</td>
+                  <td>{{employee.userprofile.full_name}}</td>
+                  <td>{{employee.userprofile.father}}</td>
+                  <td>{{employee.userprofile.present_address}}</td>
+                  <td>{{employee.userprofile.mobile}}</td>
+                  <td>{{employee.get_employee_type_display}}</td>
+                  <td>{{employee.userprofile.gender|title}}</td>
+                  <td>{{employee.userprofile.dob}}</td>
+                  <td>
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-default btn-sm"><i class="fa fa-pencil"></i></button>
+                      <button type="button" class="btn btn-default btn-sm"><i class="fa fa-times"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="11" class="alert alert-info">No employees added</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            
+            {% with employees as objects %}
+            {% include 'userprofile/pagination.html' %}
+            {% endwith %}
+
+          </div>
+        </div>        
+      </div>
+    </section>
+    
+{% endblock %}
+{% block custom_js %}
+<script>
+  $(function () {
+    $('.daterange').daterangepicker();
+  });
+</script>
+{% endblock %}

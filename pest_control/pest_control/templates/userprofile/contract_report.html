@@ -1,0 +1,111 @@
+{% extends 'userprofile/base.html' %}
+{% block main_link_id %}contractLink{% endblock %}
+{% block sub_link_id %}contractReport{% endblock %}
+{% block content %}
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      
+      <h1>
+        Contract
+        <small>Report</small>
+      </h1>
+      
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Contract</a></li>
+        <li class="active">Report</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="box box-primary">
+          <br><br>
+          <form id="contractForm" action={% url 'contract-report' %} method='GET'>
+            <div class="col-md-2">
+              <h4>Select Date Range</h4>
+            </div>
+            <div class="input-group col-md-8">
+              <input type="text" name="contract_date_range"  class="form-control daterange pull-right" required>
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary btn-flat">Search</button>
+              </span>
+            </div>
+          </form>
+
+          <div class="box-header">
+            <h3 class="box-title"></h3>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body table-responsive no-padding">
+            <table id="enquiryReportTable" class="table table-bordered table-striped dataTable">
+              <thead>
+                <tr>
+                  <td>No</td>
+                  <td>Customer ID</td>
+                  <td>Contract ID</td>
+                  <td>Enquiry Person</td>
+                  <td>Company Name</td>
+                  <td>Address</td>
+                  <td>Mobile</td>
+                  <td>Enquiry</td>
+                  <td>Service Type</td>
+                  <td>Contract Type</td>
+                  <td>Service Schedule</td>
+                  <td>Contract Date</td>
+                  <td>Contract Amount</td>
+                  <td>Billed Amount</td>
+                  <td>Received Rs</td>
+                  <td>Pending Amount</td>
+                  <td>Terms & Condition</td>
+                  <td>Whose Order</td>
+                </tr>
+              </thead>
+              <tbody>
+                {% for contract in contracts %}
+                <tr>
+                  <td>{{forloop.counter}}</td>
+                  <td>{{contract.customer.customer_id}}</td>
+                  <td>{{contract.contract_id}}</td>
+                  <td>{{contract.customer.contact_person|title}}</td>
+                  <td>{{contract.customer.company_name|title}}</td>
+                  <td>{{contract.customer.address}}</td>
+                  <td>{{contract.customer.mobile}}</td>
+                  <td>{{contract.enquiry.enquiry_id}}</td>
+                  <td>{{contract.enquiry.get_service_type_display}}</td>
+                  <td>{{contract.get_contract_type_display}}</td>
+                  <td>{{contract.schedule}}</td>
+                  <td>{{contract.date}}</td>
+                  <td>{{contract.net_contract_amount}}</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>{{contract.get_terms_display}}</td>
+                  <td>{{contract.contract_employee.userprofile.full_name}}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="12" class="alert alert-info">No contract available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+              
+            {% with contracts as objects %}
+            {% include 'userprofile/pagination.html' %}
+            {% endwith %}
+
+          </div>
+        </div>        
+      </div>
+    </section>
+    
+{% endblock %}
+{% block custom_js %}
+<script>
+  $(function () {
+    $('.daterange').daterangepicker();
+  });
+</script>
+{% endblock %}

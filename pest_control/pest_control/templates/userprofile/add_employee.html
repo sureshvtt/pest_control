@@ -1,0 +1,193 @@
+{% extends 'userprofile/base.html' %}
+{% block main_link_id %}employeeLink{% endblock %}
+{% block sub_link_id %}addEmployee{% endblock %}
+{% block content %}
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      
+      <h1>
+        Employee
+        <small>Add Employee</small>
+      </h1>
+      
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Employee</a></li>
+        <li class="active">Add Employee</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="box box-primary">
+          <form role="form" id="employeeForm" action={% url 'add-employee' %} method='POST'>{% csrf_token %}
+            <div class="box-body">
+
+              {% if success %}
+              <div class="col-md-12">
+                <div class="alert alert-success alert-dismissible">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                  <h4><i class="icon fa fa-check"></i> Success!</h4>
+                  Employee created successfully.
+                </div>
+              </div>
+              {% endif %}
+
+              {% if error %}
+              <div class="col-md-12">
+                <div class="alert alert-danger alert-dismissible">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                  <h4><i class="icon fa fa-ban"></i> Error!</h4>
+                  {% if error_message %}
+                  {{error_message}}
+                  {% else %}
+                  An error occured, please try again.
+                  {% endif %}
+                </div>
+              </div>
+              {% endif %}
+
+              <div class="form-group col-md-4">
+                <label>Employee Username</label>
+                <input name="username" id="username" type="text" class="form-control" required>
+              </div>
+              <div class="col-md-2 form-group" style="margin-top: 30px;">
+                <label><a class="checkUsernameAvailability">Check availability</a></label>
+              </div>
+              <div class="form-group col-md-6">
+                <label>Employee Password</label>
+                <input name="password" type="text" class="form-control" required>
+              </div>   
+
+              <div class="form-group col-md-6">
+                <label>Full Name</label>
+                <input name="full_name" type="text" class="form-control" required>
+              </div>      
+              <div class="form-group col-md-6">
+                <label>Gender</label>
+                <select name="gender" class="form-control">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>DOB</label>
+                <div class="input-group date">
+                  <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                  </div>
+                  <input name="dob" type="text" class="form-control datepicker">
+                </div>
+              </div>
+              <div class="form-group col-md-6">
+                <label>Email</label>
+                <input name="email" type="email" class="form-control">
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Father</label>
+                <textarea name="father" class="form-control"></textarea>
+              </div>
+              <div class="form-group col-md-6">
+                <label>Mother</label>
+                <textarea name="mother" class="form-control"></textarea>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Present Address</label>
+                <textarea name="present_address" class="form-control"></textarea>
+              </div>
+              <div class="form-group col-md-6">
+                <label>Permanent Address</label>
+                <textarea name="permanent_address" class="form-control"></textarea>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Mobile</label>
+                <input name="mobile" type="number" type="text" class="form-control" required>
+              </div>
+              <div class="form-group col-md-6">
+                <label>Landline</label>
+                <input name="landline" type="text" class="form-control">
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Maritial Status</label>
+                <select name="gender" class="form-control">
+                  <option value="">Select</option>
+                  <option value="male">Single</option>
+                  <option value="female">Married</option>
+                </select>
+              </div>
+              <div class="form-group col-md-6">
+                <label>Employee Type</label>
+                <select name="employee_type" class="form-control select2" required>
+                  <option value=''>Select Employee Type</option>
+                  {% for key, value in employee_type_choices %}
+                  <option value="{{key}}">{{value}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Date Joined</label>
+                <div class="input-group date">
+                  <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                  </div>
+                  <input name="date_joined" type="text" class="form-control datepicker" required>
+                </div>
+              </div>
+
+            </div>
+            <!-- /.box-body -->
+
+            <div class="box-footer">
+              <button type="submit" class="btn btn-primary submitBtn">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+    
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    $('#employeeForm').submit(function(event) {
+      var form = $(this);
+      form.find('.submitBtn').attr('disabled', 'disabled');
+      form.find('.submitBtn').html('Saving..')
+    });
+    $('.checkUsernameAvailability').click(function(e) {
+      e.preventDefault();
+      var link = $(this);
+      var username = $('#username').val();
+      if (username == ''){
+        alert('Username cannot be blank');
+        return false;
+      }
+      link.html('Checking..')
+      $.ajax({
+        url: '/check/username/availability/',
+        data: {username: username},
+      })
+      .done(function(data) {
+        if(data.status){
+          alert('Username available')
+        }
+        else{
+          alert('Username already used')
+        }
+      })
+      .fail(function() {
+        alert('Error while checking, please try again!')
+      })
+      .always(function() {
+        link.html('Check availability')
+      });
+    });
+</script>
+{% endblock %}
