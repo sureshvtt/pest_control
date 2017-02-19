@@ -161,3 +161,85 @@ class Contract(models.Model):
 	def __str__(self):
 		return self.contract_id
 
+invoice_status_choices = (
+	('p', 'Pending'),
+	('b', 'Billed'),
+	('snp', 'Service Not Provided'),
+)
+
+collection_type_choices = (
+	('cash', 'Cash'),
+	('cheque', 'Cheque'),
+	('online', 'Online'),
+)
+
+deposited_to_choices = (
+	('iob', 'IOB-A29'),
+)
+
+class ContractInvoice(models.Model):
+	customer = models.ForeignKey(Customer, null=True, blank=True)
+	contract = models.ForeignKey(Contract, null=True, blank=True)
+
+	invoice_no = models.IntegerField()
+	invoice_date = models.DateField(null=True, blank=True)
+
+	bill_amount = models.FloatField(null=True,blank=True)
+	recieved_amount = models.FloatField(null=True,blank=True)
+	tds_deducted = models.FloatField(null=True,blank=True)
+	discount = models.FloatField(null=True,blank=True)
+	balance_amount = models.FloatField(null=True,blank=True)
+
+	status = models.CharField(max_length=3, choices=invoice_status_choices, default='p')
+
+	collection_type = models.CharField(max_length=20, choices=collection_type_choices, default='cash')
+	collection_date = models.DateField(null=True, blank=True)
+
+	# Cheque
+	cheque_no = models.TextField(blank=True)
+	cheque_date = models.DateField(null=True, blank=True)
+
+	# Online
+	ref_no = models.TextField(blank=True)
+	transfer_date = models.DateField(null=True, blank=True)
+
+	paid_bank = models.TextField(blank=True)
+
+	deposited_to = models.CharField(max_length=20, choices=deposited_to_choices, default='iob')
+	deposited_date = models.DateField(null=True, blank=True)
+
+	remarks = models.TextField(blank=True)
+
+	active = models.BooleanField(default=True)
+	added_by = models.ForeignKey(UserProfile, null=True, blank=True, related_name="ContractInvoice_added_by")
+	edited_by = models.ForeignKey(UserProfile, null=True, blank=True, related_name="ContractInvoice_edited_by")
+	created_time = models.DateTimeField(auto_now_add=True)
+	updated_time = models.DateTimeField(auto_now=True)
+
+feedback_rating_choices = (
+	('excellent', 'Excellent'),
+	('satisfied', 'Satisfied'),
+	('poor', 'POor'),
+)
+
+class CustomerContractFeedback(models.Model):
+	customer = models.ForeignKey(Customer, null=True, blank=True)
+	contract = models.ForeignKey(Contract, null=True, blank=True)
+
+	person = models.CharField(max_length=30, null=True, blank=True)
+	designation = models.CharField(max_length=30, null=True, blank=True)
+	department = models.CharField(max_length=30, null=True, blank=True)
+	mobile = models.CharField(max_length=20, null=True, blank=True)
+	landline = models.CharField(max_length=20, null=True, blank=True)
+	email = models.CharField(max_length=100, null=True, blank=True)
+	feedback = models.TextField(blank=True)
+	rating = models.CharField(max_length=30, null=True, blank=True,choices=feedback_rating_choices)
+
+	active = models.BooleanField(default=True)
+	added_by = models.ForeignKey(UserProfile, null=True, blank=True, related_name="CustomerContractFeedback_added_by")
+	edited_by = models.ForeignKey(UserProfile, null=True, blank=True, related_name="CustomerContractFeedback_edited_by")
+	created_time = models.DateTimeField(auto_now_add=True)
+	updated_time = models.DateTimeField(auto_now=True)
+
+
+

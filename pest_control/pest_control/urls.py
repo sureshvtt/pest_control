@@ -21,6 +21,7 @@ urlpatterns = [
 	url(r'^enquiry/(?P<enq_id>[\w|\W]+)/contract/$', userprofile.views.add_contract, name='add-contract'),
 	url(r'^enquiry/(?P<enq_id>[\w|\W]+)/$', userprofile.views.edit_enquiry, name='edit-enquiry'),
 	url(r'^contract/report/$', userprofile.views.contract_report, name='contract-report'),
+	url(r'^contract/(?P<contract_id>[\w|\W]+)/$', userprofile.views.contract_details, name='contract-details'),
 	url(r'^add/employee/$', userprofile.views.add_employee, name='add-employee'),
 	url(r'^employees/list/$', userprofile.views.employees_list, name='employees-list'),
 ]

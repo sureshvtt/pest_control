@@ -1,0 +1,274 @@
+{% extends 'userprofile/base.html' %}
+{% block main_link_id %}contractLink{% endblock %}
+{% block sub_link_id %}addContract{% endblock %}
+{% load humanize %}
+{% block content %}
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      
+      <h1>
+        Contract
+        <small>{{contract.contract_id}}</small>
+      </h1>
+      
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Contract</a></li>
+        <li class="active">{{contract.contract_id}}</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="box box-primary">
+          <div class="box-header with-border">
+            <h3 class="box-title">Enquiry Details <small><a href="{% url 'contract-report' %}">go back</a></small></h3>
+          </div>
+          
+          <div class="box-body">
+            <div class="row">
+              <div class="form-group col-md-3">
+                <label>Customer Type</label>
+                <input type="text" readonly class="form-control" value="{{contract.customer.get_customer_type_display}}">
+              </div>
+              <div class="form-group col-md-3">
+                <label>Contact Person Name</label>
+                <input type="text" readonly class="form-control" value="{{contract.customer.contact_person|title}}">
+              </div>
+              <div class="form-group col-md-3">
+                <label>Contact No</label>
+                <input type="text" readonly class="form-control" value="{{contract.customer.mobile}}">
+              </div>
+              <div class="form-group col-md-3">
+                <label>Address</label>
+                <textarea readonly class="form-control">{{contract.customer.address|default:''}}</textarea>
+              </div>  
+            </div>
+            
+            <div class="row">
+              <div class="form-group col-md-3">
+                <label>Enquiry Date</label>
+                <input type="text" readonly class="form-control" value="{{contract.enquiry.enquiry_date}}">
+              </div>
+              <div class="form-group col-md-3">
+                <label>Email ID</label>
+                <input type="text" readonly class="form-control" value="{{contract.customer.email}}">
+              </div>   
+              <div class="form-group col-md-3">
+                <label>Source of Enquiry</label>
+                <input type="text" readonly class="form-control" value="">
+              </div> 
+              <div class="form-group col-md-3">
+                <label>Enquiry Created by</label>
+                <input type="text" readonly class="form-control" value="{{contract.contract_employee.userprofile.full_name}}">
+              </div> 
+            </div>
+
+            <div class="row">
+              <div class="form-group col-md-3">
+                <label>Enquiry ID</label>
+                <input type="text" readonly class="form-control" value="{{contract.enquiry.enquiry_id}}">
+              </div>
+              <div class="form-group col-md-3">
+                <label>Service Requested</label>
+                <input type="text" readonly class="form-control" value="{{contract.enquiry.service_required.service}}">
+              </div>   
+              <div class="form-group col-md-3">
+                <label>Enquiry Remarks</label>
+                <input type="text" readonly class="form-control" value="">
+              </div> 
+              <div class="form-group col-md-3">
+                <label>Surname</label>
+                <input type="text" readonly class="form-control" value="">
+              </div> 
+            </div>
+
+            <div class="row">
+              <div class="form-group col-md-3">
+                <label>TAN No</label>
+                <input type="text" readonly class="form-control" value="">
+              </div>
+              <div class="form-group col-md-3">
+                <label>PAN No</label>
+                <input type="text" readonly class="form-control" value="">
+              </div>   
+              <div class="form-group col-md-3">
+                <label>Company Category</label>
+                <input type="text" readonly class="form-control" value="{{contract.customer.get_company_type_display}}">
+              </div> 
+              <div class="form-group col-md-3">
+                <label>Customer Feedback</label>
+                <textarea readonly class="form-control">{{enquiry.comments}}</textarea>
+              </div> 
+            </div>
+
+          </div>  
+
+          <div class="box-body">
+          
+            <h4>Customer Feedback</h4>
+            <div class="row">
+              <div class="col-md-12">
+                <table class="table table-bordered table-striped">
+                  <thead>
+                    <tr>
+                      <th>Feedback Person Name</th>
+                      <th>Mobile</th>
+                      <th>Email</th>
+                      <th>Designation</th>
+                      <th>Feedback</th>
+                      <th>Rating</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for feedback in contract.customercontractfeedback_set.all %}
+                    <tr>
+                      <td>{{feedback.person}}</td>
+                      <td>{{feedback.mobile}}</td>
+                      <td>{{feedback.email}}</td>
+                      <td>{{feedback.designation}}</td>
+                      <td>{{feedback.feedback}}</td>
+                      <td>{{feedback.get_rating_display}}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="6" class="alert alert-info">No feedback available</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- /.box-body -->
+
+          {% if pending_invoices %}
+          <div class="box-body">
+            <a class="btn btn-success pull-right"><b>Make Payment</b></a>
+            <h4>Over All Billed Payment Pending</h4>
+            <div class="row">
+              <div class="col-md-12">
+                <table class="table table-bordered table-striped">
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      <th>Invoice No</th>
+                      <th>Bill Date</th>
+                      <th>Bill Amount</th>
+                      <th>Bill Balance Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for invoice in pending_invoices %}
+                    <tr>
+                      <td>{{forloop.counter}}</td>
+                      <td>{{invoice.invoice_no}}</td>
+                      <td>{{invoice.invoice_date}}</td>
+                      <td>{{invoice.bill_amount|floatformat:2|intcomma}}</td>
+                      <td>{{invoice.balance_amount|floatformat:2|intcomma}}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div> 
+          </div>
+          {% endif %}
+
+          <div class="box-body">
+            <h4>Over All Collection Details</h4>
+            <div class="row">
+              <div class="col-md-12">
+                <table class="table table-bordered table-striped">
+                  <thead>
+                    <tr>
+                      <th>Invoice No</th>
+                      <th>Bill Date</th>
+                      <th>Recieved Date</th>
+                      <th>Recieved Amount</th>
+                      <th>TDS</th>
+                      <th>Due to Service Lost</th>
+                      <th>Payment Mode</th>
+                      <th>Payment Details</th>
+                      <th>To be Deposit</th> 
+                      <th>Bank Challan</th>
+                      <th>Remarks</th> 
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for invoice in billed_invoices %}
+                    <tr>
+                      <td>{{invoice.invoice_no}}</td>
+                      <td>{{invoice.invoice_date}}</td>
+                      <td>{{invoice.collection_date}}</td>
+                      <td>{{invoice.recieved_amount}}</td>
+                      <td>{{invoice.tds_deducted}}</td>
+                      <td></td>
+                      <td>{{invoice.tds_deducted}}</td>
+                      <td>{{invoice.get_collection_type_display}}</td>
+                      <td>
+                        {% if payment.collection_type == 'cheque' %}
+                        {{invoice.cheque_no}}<br>
+                        {{invoice.cheque_date}}<br>
+                        {{invoice.paid_bank}}
+                        {% elif payment.collection_type == 'online' %}
+                        {{invoice.ref_no}}<br>
+                        {{invoice.transfer_date}}<br>
+                        {{invoice.paid_bank}}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {{invoice.deposited_to}}<br>
+                        on {{invoice.deposited_date}}
+                      </td>
+                      <td></td>
+                      <td>{{invoice.remarks}}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="11" class="alert alert-info">No payment yet.</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div> 
+          </div>
+
+          <div class="box-body">
+            <h4>Contract Details</h4>
+            <div class="row">
+              <div class="col-md-12">
+                <strong>Contract Period : 01 Apr 2016 To 30 Apr 2016  </strong>
+              </div>
+            </div> 
+          </div>
+
+          <div class="box-body">
+            <h4>Chemical Usage Report</h4>
+            <div class="row">
+              <div class="col-md-12">
+              </div>
+            </div> 
+          </div>
+          
+          <div class="box-body">
+            <h4>Service Delivered Details</h4>
+            <div class="row">
+              <div class="col-md-12">
+              </div>
+            </div> 
+          </div>
+
+        </div>
+      </div>
+    </section>
+    
+{% endblock %}
+
+{% block custom_js %}
+<script>
+</script>
+
+{% endblock %}

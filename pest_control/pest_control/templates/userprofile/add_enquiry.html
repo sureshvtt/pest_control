@@ -21,7 +21,7 @@
     <section class="content">
       <div class="row">
         <div class="box box-primary">
-          <form role="form" id="enquiryForm" action={% url 'add-enquiry' %} method='POST'>{% csrf_token %}
+          <form role="form" id="enquiryForm" action="{% url 'add-enquiry' %}" method='POST'>{% csrf_token %}
             <div class="box-body">
 
               {% if success %}

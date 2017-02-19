@@ -66,7 +66,7 @@
 
           </div>  
 
-          <form role="form" id="contractForm" action={% url 'add-contract' enq_id=enquiry.enquiry_id %} method='POST'>{% csrf_token %}
+          <form role="form" id="contractForm" action="{% url 'add-contract' enq_id=enquiry.enquiry_id %}" method='POST'>{% csrf_token %}
             <div class="box-body">
             
               <h4>Contract Details</h4>
@@ -255,7 +255,7 @@
     var contract_type = $(this).val();
     if(contract_type == 's'){
       $('#terms').val('100');
-      $('#terms').attr('disabled', 'disabled')
+      $('#terms').attr('readonly', true);
     }
     else{
       $('.perMonthAmount').html('')
@@ -301,7 +301,6 @@
 {% if success %}
 <script>
   alert('Contract saved successfully');
-  window.location = "/dashboard/";
 </script>
 {% endif %}
 

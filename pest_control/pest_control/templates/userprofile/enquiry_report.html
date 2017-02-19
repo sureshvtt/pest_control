@@ -1,4 +1,4 @@
-{% extends 'userprofile/base.html' %}
+h{% extends 'userprofile/base.html' %}
 {% block main_link_id %}enquiryLink{% endblock %}
 {% block sub_link_id %}enquiryReport{% endblock %}
 {% block content %}
@@ -29,7 +29,7 @@
             <div class="input-group col-md-8">
               <input type="text" name="enquiry_date_range"  class="form-control daterange pull-right" required>
               <span class="input-group-btn">
-                <button type="submit" class="btn btn-primary btn-flat">Search</button>
+                <button type="submit" class="btn btn-primary btn-flat submitBtn">Search</button>
               </span>
             </div>
           </form>
@@ -39,21 +39,21 @@
           </div>
           <!-- /.box-header -->
           <div class="box-body table-responsive no-padding">
-            <table id="enquiryReportTable" class="table table-bordered table-striped">
+            <table id="enquiryReportTable" class="table table-bordered table-striped dataTable">
               <thead>
                 <tr>
-                  <td>No</td>
-                  <td>Enquiry ID</td>
-                  <td>Enquiry Person</td>
-                  <td>Customer Type</td>
-                  <td>Company Name</td>
-                  <td>Company Type</td>
-                  <td>Address</td>
-                  <td>Mobile</td>
-                  <td>Email</td>
-                  <td>Service Type</td>
-                  <td>Enquiry Date</td>
-                  <td>Status</td>
+                  <th>No</th>
+                  <th>Enquiry ID</th>
+                  <th>Enquiry Person</th>
+                  <th>Customer Type</th>
+                  <th>Company Name</th>
+                  <th>Company Type</th>
+                  <th>Address</th>
+                  <th>Mobile</th>
+                  <th>Email</th>
+                  <th>Service Type</th>
+                  <th>Enquiry Date</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -102,6 +102,11 @@
 <script>
   $(function () {
     $('.daterange').daterangepicker();
+  });
+  $('#enquiryForm').submit(function(e) {
+    var form = $(this);
+    form.find('.submitBtn').attr('disabled', 'disabled');
+    form.find('.submitBtn').html('Searching..')
   });
 </script>
 {% endblock %}

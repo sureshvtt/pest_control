@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from customer.models import customer_type_choices, company_type_choices, salutation_choices, enquiry_choices, Enquiry, EnquiryService, Customer, contract_type_choices, contract_terms_choices, Contract
 from userprofile.models import UserProfile, Employee, employee_type_choices
 
+from pest_control.utils import generate_bill
+
 import datetime
 import json
 
@@ -40,7 +42,16 @@ def check_username_availabilty(request):
 
 @login_required
 def dashboard(request):
-	return render(request, 'userprofile/dashboard.html')
+	response = {}
+	if 'contract_created' in request.GET and request.GET['contract_created']:
+		try:
+			contract = get_object_or_404(Contract, contract_id=request.GET['contract_created'])
+		except:
+			pass
+		else:
+			response.update({'contract':contract})
+
+	return render(request, 'userprofile/dashboard.html', response)
 
 @login_required
 def add_enquiry(request):
@@ -196,6 +207,10 @@ def add_contract(request, enq_id):
 		contract.terms = request.POST['terms']
 		contract.save()
 
+		if contract.contract_type == 's':
+			generate_bill(contract=contract)
+
+		return HttpResponseRedirect('/dashboard/?contract_created=' + str(contract.contract_id))
 		response.update({'success':True})
 
 	return render(request, 'userprofile/add_contract.html', response)
@@ -213,12 +228,33 @@ def contract_report(request):
 		from_date = datetime.datetime.strptime(contract_date_range[0].replace(" ", ""), '%m/%d/%Y')
 		to_date = datetime.datetime.strptime(contract_date_range[1].replace(" ", ""), '%m/%d/%Y')
 
-		contracts = contracts.filter(contract_date_range=(from_date, to_date + datetime.timedelta(days=1)))
+		contracts = contracts.filter(date__range=(from_date, to_date + datetime.timedelta(days=1)))
+
+		response.update({'from_date':from_date})
+		response.update({'to_date':to_date})
 	
 	contracts = MyPaginator(contracts, page)
 
 	response.update({'contracts':contracts})
 	return render(request, 'userprofile/contract_report.html', response)
+
+@login_required
+def contract_details(request, contract_id):
+	response = {}
+
+	try:
+		contract = Contract.objects.select_related('customer','enquiry').prefetch_related('customercontractfeedback_set', 'contractinvoice_set').get(contract_id=contract_id)
+	except:
+		raise Http404()
+
+	pending_invoices = contract.contractinvoice_set.filter(status='p')
+	billed_invoices = contract.contractinvoice_set.exclude(status='p')
+
+	response.update({'contract':contract})
+	response.update({'pending_invoices':pending_invoices})
+	response.update({'billed_invoices':billed_invoices})
+
+	return render(request, 'userprofile/contract_details.html', response)
 
 @login_required
 def add_employee(request):
